@@ -9,6 +9,7 @@ import { theme } from '@/constants/theme';
 import Input from '@/components/Input';
 import Icon from '@/assets/icons';
 import Button from '@/components/Button';
+import { supabase } from '@/lib/supabase';
 
 const SignUp: React.FC = () => {
   const router = useRouter();
@@ -21,6 +22,29 @@ const SignUp: React.FC = () => {
     if (!emailRef.current || !passwordRef.current) {
       Alert.alert('Sign Up', 'Please fill in all fields!');
       return;
+    }
+
+    let name = nameRef.current.trim();
+    let email = emailRef.current.trim();
+    let password = passwordRef.current.trim();
+
+    setLoading(true);
+
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    console.log('session', session);
+    console.log('error', error);
+
+    if (error) {
+      Alert.alert('Sign Up', error.message);
     }
   };
 
