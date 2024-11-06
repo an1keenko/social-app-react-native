@@ -1,0 +1,3 @@
+export const supabaseUrl = 'https://mbdsbrerajgkfcqwaeuq.supabase.co';
+export const supabaseAnonKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1iZHNicmVyYWpna2ZjcXdhZXVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzA4NDExMjgsImV4cCI6MjA0NjQxNzEyOH0.pI9cR2qBS6_vTwcaDZER9Uy052Uqadx1bCtb0lUpsO0';

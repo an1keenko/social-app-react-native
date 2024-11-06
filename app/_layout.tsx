@@ -3,7 +3,7 @@ import { Stack, useRouter } from 'expo-router';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 
-const _layout = () => {
+const MainLayout: React.FC = () => {
   const { setAuth } = useAuth();
   const router = useRouter();
 
@@ -21,15 +21,15 @@ const _layout = () => {
     });
   }, []);
 
-  return (
-    <AuthProvider>
-      <MainLayout />
-    </AuthProvider>
-  );
+  return <Stack screenOptions={{ headerShown: false }} />;
 };
 
-const MainLayout: React.FC = () => {
-  return <Stack screenOptions={{ headerShown: false }} />;
+const _layout = () => {
+  return (
+      <AuthProvider>
+        <MainLayout />
+      </AuthProvider>
+  );
 };
 
 export default _layout;
