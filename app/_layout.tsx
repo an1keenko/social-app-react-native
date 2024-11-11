@@ -26,7 +26,7 @@ const MainLayout: React.FC = () => {
   const updateUserData = async (user) => {
     let res = await getUserData(user?.id);
     if (res.success) setUserData(res.data);
-
+  }
 
   return <Stack screenOptions={{ headerShown: false }} />;
 };
