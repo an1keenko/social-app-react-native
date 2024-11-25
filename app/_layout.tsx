@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import {getUserData} from "@/services/getUserData";
+import { getUserData } from '@/services/userService';
 
 const MainLayout: React.FC = () => {
   const { setAuth, setUserData } = useAuth();
@@ -26,7 +26,7 @@ const MainLayout: React.FC = () => {
   const updateUserData = async (user) => {
     let res = await getUserData(user?.id);
     if (res.success) setUserData(res.data);
-  }
+  };
 
   return <Stack screenOptions={{ headerShown: false }} />;
 };
