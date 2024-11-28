@@ -8,9 +8,12 @@ import Button from '@/components/Button';
 import { hp, wp } from '@/helpers/common';
 import { theme } from '@/constants/theme';
 import Icon from '@/assets/icons';
+import { useRouter } from 'expo-router';
+import Avatar from '@/components/Avatar';
 
 const Home = () => {
-  const { setAuth } = useAuth();
+  const { user, setAuth } = useAuth();
+  const router = useRouter();
 
   const onLogout = async () => {
     setAuth(null);
@@ -21,19 +24,19 @@ const Home = () => {
   };
 
   return (
-    <ScreenWrapper>
+    <ScreenWrapper background="white">
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>LinkUp</Text>
           <View style={styles.icon}>
-            <Pressable>
+            <Pressable onPress={() => router.push('/notifications')}>
               <Icon name="heart" size={hp(3.2)} strokeWidth={2} color={theme.colors.text}></Icon>
             </Pressable>
-            <Pressable>
+            <Pressable onPress={() => router.push('/newPost')}>
               <Icon name="plus" size={hp(3.2)} strokeWidth={2} color={theme.colors.text}></Icon>
             </Pressable>
-            <Pressable>
-              <Icon name="user" size={hp(3.2)} strokeWidth={2} color={theme.colors.text}></Icon>
+            <Pressable onPress={() => router.push('/profile')}>
+              <Avatar uri={user?.image} size={hp(4.3)} rounded={theme.radius.sm} style={{ borderWidth: 2 }} />
             </Pressable>
           </View>
         </View>
