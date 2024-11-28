@@ -1,13 +1,13 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-const Profile = () => {
+const NewPost = () => {
   return (
     <View>
-      <Text>Profile</Text>
+      <Text>Notifications</Text>
     </View>
   );
 };
 
-export default Profile;
+export default NewPost;
 
 const styles = StyleSheet.create({});
