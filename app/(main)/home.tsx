@@ -1,6 +1,7 @@
 import React from 'react';
-
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+
 import ScreenWrapper from '@/components/ScreenWrapper';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -8,7 +9,6 @@ import Button from '@/components/Button';
 import { hp, wp } from '@/helpers/common';
 import { theme } from '@/constants/theme';
 import Icon from '@/assets/icons';
-import { useRouter } from 'expo-router';
 import Avatar from '@/components/Avatar';
 
 const Home = () => {
