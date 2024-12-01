@@ -15,7 +15,7 @@ const MainLayout: React.FC = () => {
 
       if (session) {
         setAuth(session?.user);
-        updateUserData(session.user);
+        updateUserData(session?.user, session?.user?.email);
         router.push('/home');
       } else {
         setAuth(null);
@@ -24,9 +24,9 @@ const MainLayout: React.FC = () => {
     });
   }, []);
 
-  const updateUserData = async (user) => {
+  const updateUserData = async (user, email) => {
     let res = await getUserData(user?.id);
-    if (res.success) setUserData(res.data);
+    if (res.success) setUserData({ ...res.data, email });
   };
 
   return <Stack screenOptions={{ headerShown: false }} />;

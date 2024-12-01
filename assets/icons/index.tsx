@@ -9,7 +9,6 @@ import Plus from './Plus';
 import Search from './Search';
 import Location from './Location';
 import Call from './Call';
-import { theme } from '@/constants/theme';
 import Camera from './Camera';
 import Edit from './Edit';
 import ArrowLeft from './ArrowLeft';
@@ -22,6 +21,8 @@ import Delete from './Delete';
 import Logout from './Logout';
 import Image from './Image';
 import Video from './Video';
+
+import { theme } from '@/constants/theme';
 
 const icons = {
   home: Home,

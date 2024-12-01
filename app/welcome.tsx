@@ -1,11 +1,12 @@
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import ScreenWrapper from '@/components/ScreenWrapper';
 import { StatusBar } from 'expo-status-bar';
+import { useRouter } from 'expo-router';
+
+import ScreenWrapper from '@/components/ScreenWrapper';
 import { hp, wp } from '@/helpers/common';
 import { theme } from '@/constants/theme';
 import Button from '@/components/Button';
-import { router, useRouter } from 'expo-router';
 
 const Welcome: React.FC = () => {
   const router = useRouter();

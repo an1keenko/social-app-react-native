@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
-import ScreenWrapper from '@/components/ScreenWrapper';
 import { StatusBar } from 'expo-status-bar';
-import BackButton from '@/components/BackButton';
 import { useRouter } from 'expo-router';
+
+import ScreenWrapper from '@/components/ScreenWrapper';
+import BackButton from '@/components/BackButton';
 import { hp, wp } from '@/helpers/common';
 import { theme } from '@/constants/theme';
 import Input from '@/components/Input';
