@@ -4,14 +4,14 @@ import { theme } from '@/constants/theme';
 import { hp } from '@/helpers/common';
 
 interface InputProps extends TextInputProps {
-  containerStyles?: ViewStyle;
+  containerStyle?: ViewStyle;
   icon?: React.ReactNode;
   inputRef?: React.RefObject<TextInput>;
 }
 
 const Input: React.FC<InputProps> = (props) => {
   return (
-    <View style={[styles.container, props.containerStyles && props.containerStyles]}>
+    <View style={[styles.container, props.containerStyle && props.containerStyle]}>
       {props.icon && props.icon}
       <TextInput style={{ flex: 1 }} placeholderTextColor={theme.colors.textLight} ref={props.inputRef} {...props} />
     </View>
