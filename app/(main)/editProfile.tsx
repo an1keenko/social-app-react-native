@@ -5,7 +5,7 @@ import { hp, wp } from '@/helpers/common';
 import { theme } from '@/constants/theme';
 import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
-import { getUserImageSrc } from '@/services/imageService';
+import { getUserImageSrc, uploadFile } from '@/services/imageService';
 import Icon from '@/assets/icons';
 import { Image } from 'expo-image';
 import Input from '@/components/Input';
@@ -62,6 +62,9 @@ const EditProfile = () => {
     setLoading(true);
 
     if (typeof image == 'object') {
+      let imageRes = await uploadFile('profile', image.uri, true);
+      if (imageRes.success) userData.image = imageRes.data;
+      else userData.image = null;
     }
 
     const res = await updateUser(currentUser?.id, userData);
