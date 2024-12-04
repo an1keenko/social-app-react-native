@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Share, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { theme } from '@/constants/theme';
 import Avatar from '@/components/Avatar';
-import { hp, wp } from '@/helpers/common';
+import { hp, stripHtmlTags, wp } from '@/helpers/common';
 import moment from 'moment';
 import Icon from '@/assets/icons';
 import RenderHtml from 'react-native-render-html';
 import { Image } from 'expo-image';
-import { getSupabaseFileUrl } from '@/services/imageService';
+import { downloadFile, getSupabaseFileUrl } from '@/services/imageService';
 import { Video } from 'expo-av';
 import { createPostLike, removePostLike } from '@/services/postService';
+import Loading from '@/components/Loading';
 
 const textStyle = {
   div: {
@@ -31,7 +32,7 @@ const tagsStyles = {
   },
 };
 
-const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
+const PostCard = ({ item, currentUser, router, hasShadow = true, showMoreIcon = true }) => {
   const shadowStyles = {
     shadowOffset: {
       width: 0,
@@ -43,12 +44,16 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
   };
 
   const [likes, setLikes] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLikes(item?.postLikes);
   }, []);
 
-  const openPostDetails = () => {};
+  const openPostDetails = () => {
+    if (!showMoreIcon) return;
+    router.push(`/postDetails?postId=${item?.id}`);
+  };
 
   const onLike = async () => {
     if (liked) {
@@ -72,6 +77,17 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
     }
   };
 
+  const onShare = async () => {
+    let content = { message: stripHtmlTags(item?.body) };
+    if (item?.file) {
+      setLoading(true);
+      let url = await downloadFile(getSupabaseFileUrl(item?.file)?.uri);
+      setLoading(false);
+      content.url = url;
+    }
+    Share.share(content);
+  };
+
   const createdAt = moment(item?.created_at).format('MMM DD');
   const liked = likes.some((like) => like.userId === currentUser?.id);
 
@@ -85,9 +101,11 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
             <Text style={styles.postTime}>{createdAt}</Text>
           </View>
         </View>
-        <TouchableOpacity onPress={openPostDetails}>
-          <Icon name="threeDotsHorizontal" size={hp(3.4)} strokeWidth={3} color={theme.colors.text} />
-        </TouchableOpacity>
+        {showMoreIcon && (
+          <TouchableOpacity onPress={openPostDetails}>
+            <Icon name="threeDotsHorizontal" size={hp(3.4)} strokeWidth={3} color={theme.colors.text} />
+          </TouchableOpacity>
+        )}
       </View>
       <View style={styles.content}>
         <View style={styles.postBody}>
@@ -119,15 +137,19 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
           <Text style={styles.count}>{likes?.length}</Text>
         </View>
         <View style={styles.footerButton}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={openPostDetails}>
             <Icon name="comment" size={24} color={theme.colors.textLight} />
           </TouchableOpacity>
-          <Text style={styles.count}>{0}</Text>
+          <Text style={styles.count}>{item?.comments[0]?.count}</Text>
         </View>
         <View style={styles.footerButton}>
-          <TouchableOpacity>
-            <Icon name="share" size={24} color={theme.colors.textLight} />
-          </TouchableOpacity>
+          {loading ? (
+            <Loading size="small" />
+          ) : (
+            <TouchableOpacity onPress={onShare}>
+              <Icon name="share" size={24} color={theme.colors.textLight} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </View>

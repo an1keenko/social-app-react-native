@@ -88,7 +88,7 @@ const Home = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.listStyle}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => <PostCard item={item} currentUser={user} router />}
+          renderItem={({ item }) => <PostCard item={item} currentUser={user} router={router} />}
           onEndReached={() => {
             getPosts();
           }}

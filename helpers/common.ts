@@ -9,3 +9,7 @@ export const hp = (percent: number) => {
 export const wp = (percent: number) => {
   return (percent * deviceWidth) / 100;
 };
+
+export const stripHtmlTags = (html) => {
+  return html.replace(/<[^>]*>?/gm, '');
+};
