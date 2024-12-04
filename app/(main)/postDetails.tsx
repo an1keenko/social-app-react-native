@@ -61,6 +61,14 @@ const PostDetails = () => {
     );
   }
 
+  if(!post) {
+    return (
+      <View style={[styles.center, {justifyContent: 'flex-start', marginTop: 100}]}>
+        <Text style={styles.notFound}>Post not found!</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.list}>
