@@ -76,7 +76,8 @@ const PostCard = ({ item, currentUser, router, hasShadow = true, showMoreIcon = 
       }
     }
   };
-
+  // console.log(item?.comments[0]?.count);
+  console.log(item?.comments);
   const onShare = async () => {
     let content = { message: stripHtmlTags(item?.body) };
     if (item?.file) {

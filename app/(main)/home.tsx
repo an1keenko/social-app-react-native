@@ -51,6 +51,7 @@ const Home = () => {
     limit = limit + 4;
 
     let res = await fetchPosts(limit);
+    console.log(res, 'q');
     if (res.success) {
       if (posts.length == res.data.length) setHasMore(false);
       setPosts(res.data);
