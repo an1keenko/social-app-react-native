@@ -4,6 +4,7 @@ import { Stack, useRouter } from 'expo-router';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { getUserData } from '@/services/userService';
+import { LogBox } from 'react-native';
 
 const MainLayout: React.FC = () => {
   const { setAuth, setUserData } = useAuth();
@@ -32,6 +33,11 @@ const MainLayout: React.FC = () => {
   return <Stack screenOptions={{ headerShown: false }} />;
 };
 
+LogBox.ignoreLogs([
+  'Warning: TNodeChildrenRenderer',
+  'Warning: MemoizedTNodeChildrenRenderer',
+  'Warning: TRenderEngineProvider',
+]);
 const _layout = () => {
   return (
     <AuthProvider>
