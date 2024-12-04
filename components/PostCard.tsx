@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { theme } from '@/constants/theme';
 import Avatar from '@/components/Avatar';
 import { hp, wp } from '@/helpers/common';
@@ -10,6 +10,7 @@ import RenderHtml from 'react-native-render-html';
 import { Image } from 'expo-image';
 import { getSupabaseFileUrl } from '@/services/imageService';
 import { Video } from 'expo-av';
+import { createPostLike, removePostLike } from '@/services/postService';
 
 const textStyle = {
   div: {
@@ -41,11 +42,39 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
     elevation: 1,
   };
 
+  const [likes, setLikes] = useState([]);
+
+  useEffect(() => {
+    setLikes(item?.postLikes);
+  }, []);
+
   const openPostDetails = () => {};
 
+  const onLike = async () => {
+    if (liked) {
+      let updatedLikes = likes.filter((like) => like.userId !== currentUser?.id);
+
+      setLikes([...updatedLikes]);
+      let res = await removePostLike(item?.id, currentUser?.id);
+      if (!res.success) {
+        Alert.alert('Post', 'Something went wrong!');
+      }
+    } else {
+      let data = {
+        userId: currentUser?.id,
+        postId: item?.id,
+      };
+      setLikes([...likes, data]);
+      let res = await createPostLike(data);
+      if (!res.success) {
+        Alert.alert('Post', 'Something went wrong!');
+      }
+    }
+  };
+
   const createdAt = moment(item?.created_at).format('MMM DD');
-  const likes = [];
-  const liked = false;
+  const liked = likes.some((like) => like.userId === currentUser?.id);
+
   return (
     <View style={[styles.container, hasShadow && shadowStyles]}>
       <View style={styles.header}>
@@ -79,7 +108,7 @@ const PostCard = ({ item, currentUser, router, hasShadow = true }) => {
       </View>
       <View style={styles.footer}>
         <View style={styles.footerButton}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={onLike}>
             <Icon
               name="heart"
               size={24}
