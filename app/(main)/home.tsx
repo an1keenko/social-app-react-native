@@ -1,5 +1,5 @@
-import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import ScreenWrapper from '@/components/ScreenWrapper';
@@ -10,10 +10,44 @@ import { hp, wp } from '@/helpers/common';
 import { theme } from '@/constants/theme';
 import Icon from '@/assets/icons';
 import Avatar from '@/components/Avatar';
+import { fetchPosts } from '@/services/postService';
+import PostCard from '@/components/PostCard';
+import Loading from '@/components/Loading';
+import { getUserData } from '@/services/userService';
+
+let limit = 0;
 
 const Home = () => {
   const { user, setAuth } = useAuth();
   const router = useRouter();
+
+  const [posts, setPosts] = useState([]);
+
+  const handlePostEvent = async (payload) => {
+    if (payload.eventType == 'INSERT' && payload?.new?.id) {
+      let newPost = { ...payload.new };
+      let res = await getUserData(newPost.userId);
+      newPost.user = res.success ? res.data : {};
+      setPosts((prevPosts) => [newPost, ...prevPosts]);
+    }
+  };
+
+  useEffect(() => {
+    let postChannel = supabase
+      .channel('posts')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, handlePostEvent)
+      .subscribe();
+
+    getPosts();
+  }, []);
+
+  const getPosts = async () => {
+    limit = limit + 10;
+    let res = await fetchPosts(limit);
+    if (res.success) {
+      setPosts(res.data);
+    }
+  };
 
   // const onLogout = async () => {
   //   setAuth(null);
@@ -40,6 +74,19 @@ const Home = () => {
             </Pressable>
           </View>
         </View>
+
+        <FlatList
+          data={posts}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.listStyle}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => <PostCard item={item} currentUser={user} router />}
+          ListFooterComponent={
+            <View style={{ marginVertical: posts.length == 0 ? 200 : 30 }}>
+              <Loading />
+            </View>
+          }
+        />
       </View>
       {/*<Button title="Log out" onPress={onLogout}></Button>*/}
     </ScreenWrapper>
@@ -92,5 +139,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: theme.colors.text,
     fontSize: hp(1.6),
+  },
+  listStyle: {
+    paddingTop: 20,
+    paddingHorizontal: wp(4),
   },
 });
