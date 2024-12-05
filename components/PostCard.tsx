@@ -48,7 +48,7 @@ const PostCard = ({ item, currentUser, router, hasShadow = true, showMoreIcon = 
 
   useEffect(() => {
     setLikes(item?.postLikes);
-  }, []);
+  }, [item?.postLikes]);
 
   const openPostDetails = () => {
     if (!showMoreIcon) return;
@@ -57,32 +57,31 @@ const PostCard = ({ item, currentUser, router, hasShadow = true, showMoreIcon = 
 
   const onLike = async () => {
     if (liked) {
-      let updatedLikes = likes.filter((like) => like.userId !== currentUser?.id);
+      const updatedLikes = likes.filter((like) => like.userId !== currentUser?.id);
 
       setLikes([...updatedLikes]);
-      let res = await removePostLike(item?.id, currentUser?.id);
+      const res = await removePostLike(item?.id, currentUser?.id);
       if (!res.success) {
         Alert.alert('Post', 'Something went wrong!');
       }
     } else {
-      let data = {
+      const data = {
         userId: currentUser?.id,
         postId: item?.id,
       };
       setLikes([...likes, data]);
-      let res = await createPostLike(data);
+      const res = await createPostLike(data);
       if (!res.success) {
         Alert.alert('Post', 'Something went wrong!');
       }
     }
   };
-  // console.log(item?.comments[0]?.count);
-  console.log(item?.comments);
+
   const onShare = async () => {
-    let content = { message: stripHtmlTags(item?.body) };
+    const content = { message: stripHtmlTags(item?.body) };
     if (item?.file) {
       setLoading(true);
-      let url = await downloadFile(getSupabaseFileUrl(item?.file)?.uri);
+      const url = await downloadFile(getSupabaseFileUrl(item?.file)?.uri);
       setLoading(false);
       content.url = url;
     }
@@ -91,6 +90,8 @@ const PostCard = ({ item, currentUser, router, hasShadow = true, showMoreIcon = 
 
   const createdAt = moment(item?.created_at).format('MMM DD');
   const liked = likes.some((like) => like.userId === currentUser?.id);
+
+  const commentCount = item?.comments?.length || 0;
 
   return (
     <View style={[styles.container, hasShadow && shadowStyles]}>
@@ -141,7 +142,7 @@ const PostCard = ({ item, currentUser, router, hasShadow = true, showMoreIcon = 
           <TouchableOpacity onPress={openPostDetails}>
             <Icon name="comment" size={24} color={theme.colors.textLight} />
           </TouchableOpacity>
-          <Text style={styles.count}>{item?.comments[0]?.count}</Text>
+          <Text style={styles.count}>{commentCount}</Text>
         </View>
         <View style={styles.footerButton}>
           {loading ? (
