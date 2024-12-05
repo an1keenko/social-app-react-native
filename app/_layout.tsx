@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { getUserData } from '@/services/userService';
 import { LogBox } from 'react-native';
+import Home from '@/app/(main)/home';
 
 const MainLayout: React.FC = () => {
   const { setAuth, setUserData } = useAuth();
@@ -30,7 +31,16 @@ const MainLayout: React.FC = () => {
     if (res.success) setUserData({ ...res.data, email });
   };
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen
+        name="(main)/postDetails"
+        options={{
+          presentation: 'modal',
+        }}
+      />
+    </Stack>
+  );
 };
 
 LogBox.ignoreLogs([
