@@ -5,7 +5,6 @@ import { useRouter } from 'expo-router';
 import ScreenWrapper from '@/components/ScreenWrapper';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import Button from '@/components/Button';
 import { hp, wp } from '@/helpers/common';
 import { theme } from '@/constants/theme';
 import Icon from '@/assets/icons';
@@ -28,8 +27,26 @@ const Home = () => {
     if (payload.eventType == 'INSERT' && payload?.new?.id) {
       let newPost = { ...payload.new };
       let res = await getUserData(newPost.userId);
+      newPost.postLikes = [];
+      newPost.comments = [{ count: 0 }];
       newPost.user = res.success ? res.data : {};
       setPosts((prevPosts) => [newPost, ...prevPosts]);
+    }
+    if (payload.eventType === 'DELETE' && payload.old?.id) {
+      setPosts((prevPosts) => {
+        return prevPosts.filter((post) => post.id != payload.old.id);
+      });
+    }
+    if (payload.eventType == 'UPDATE' && payload?.new?.id) {
+      setPosts((prevPosts) => {
+        return prevPosts.map((post) => {
+          if (post.id == payload.new.id) {
+            post.body = payload.new.body;
+            post.file = payload.new.file;
+          }
+          return post;
+        });
+      });
     }
   };
 
@@ -51,7 +68,7 @@ const Home = () => {
     limit = limit + 4;
 
     let res = await fetchPosts(limit);
-    console.log(res, 'q');
+
     if (res.success) {
       if (posts.length == res.data.length) setHasMore(false);
       setPosts(res.data);

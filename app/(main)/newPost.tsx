@@ -6,8 +6,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { theme } from '@/constants/theme';
 import Avatar from '@/components/Avatar';
 import RichTextEditor from '@/components/RichTextEditor';
-import { useRef, useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import Icon from '@/assets/icons';
 import Button from '@/components/Button';
 import * as ImagePicker from 'expo-image-picker';
@@ -17,12 +17,23 @@ import { Video } from 'expo-av';
 import { createOrUpdatePost } from '@/services/postService';
 
 const NewPost = () => {
+  const post = useLocalSearchParams();
   const { user } = useAuth();
   const bodyRef = useRef('');
   const editorRef = useRef(null);
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [file, setFile] = useState(null);
+
+  useEffect(() => {
+    if (post && post.id) {
+      bodyRef.current = post.body;
+      setFile(post.file || null);
+      setTimeout(() => {
+        editorRef.current?.setContentHTML(post.body);
+      }, 300);
+    }
+  }, []);
 
   const onPick = async (isImage) => {
     let mediaConfig = {
@@ -87,6 +98,8 @@ const NewPost = () => {
       userId: user?.id,
     };
 
+    if (post && post.id) data.id = post.id;
+
     setLoading(true);
     let res = await createOrUpdatePost(data);
     setLoading(false);
@@ -147,7 +160,7 @@ const NewPost = () => {
         </ScrollView>
         <Button
           buttonStyle={{ height: hp(6.2) }}
-          title="Post"
+          title={post && post.id ? 'Update' : 'Post'}
           loading={loading}
           hasShadow={false}
           onPress={onSubmit}
