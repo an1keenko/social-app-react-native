@@ -31,14 +31,18 @@ const Profile = () => {
   };
 
   const getPosts = async () => {
-    if (!hasMore) return null;
-    limit = limit + 4;
+    if (!hasMore) return;
 
-    let res = await fetchPosts(limit, user.id);
+    const newLimit = limit + 4;
+    const res = await fetchPosts(newLimit, user.id);
 
     if (res.success) {
-      if (posts.length == res.data.length) setHasMore(false);
-      setPosts(res.data);
+      if (res.data.length <= posts.length) {
+        setHasMore(false);
+      } else {
+        setPosts(res.data);
+        limit = newLimit;
+      }
     }
   };
 
