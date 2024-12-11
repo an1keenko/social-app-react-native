@@ -22,6 +22,7 @@ const Home = () => {
 
   const [posts, setPosts] = useState([]);
   const [hasMore, setHasMore] = useState(true);
+  const [notificationCount, setNotificationCount] = useState(0);
 
   const handlePostEvent = async (payload) => {
     if (payload.eventType == 'INSERT' && payload?.new?.id) {
@@ -50,6 +51,13 @@ const Home = () => {
     }
   };
 
+  const handleNewNotification = async (payload) => {
+    console.log(payload);
+    if (payload.eventType === 'INSERT' && payload.new.id) {
+      setNotificationCount((prev) => prev + 1);
+    }
+  };
+
   useEffect(() => {
     let postChannel = supabase
       .channel('posts')
@@ -58,8 +66,18 @@ const Home = () => {
 
     // getPosts();
 
+    let notificationChannel = supabase
+      .channel('notifications')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'notifications', filter: `receiverId=eq.${user.id}` },
+        handleNewNotification,
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(postChannel);
+      supabase.removeChannel(notificationChannel);
     };
   }, []);
 
@@ -88,9 +106,14 @@ const Home = () => {
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>LinkUp</Text>
-          <View style={styles.icon}>
+          <View style={styles.icons}>
             <Pressable onPress={() => router.push('/notifications')}>
               <Icon name="heart" size={hp(3.2)} strokeWidth={2} color={theme.colors.text}></Icon>
+              {notificationCount > 0 && (
+                <View style={styles.pill}>
+                  <Text style={styles.pillText}>{notificationCount}</Text>
+                </View>
+              )}
             </Pressable>
             <Pressable onPress={() => router.push('/newPost')}>
               <Icon name="plus" size={hp(3.2)} strokeWidth={2} color={theme.colors.text}></Icon>
@@ -154,7 +177,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.gray,
     borderWidth: 3,
   },
-  icon: {
+  icons: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -193,5 +216,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 20,
+  },
+  pillText: {
+    color: 'white',
+    fontSize: hp(1.2),
+    fontWeight: theme.fonts.bold,
   },
 });

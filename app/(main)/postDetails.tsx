@@ -12,9 +12,10 @@ import Input from '@/components/Input';
 import Icon from '@/assets/icons';
 import CommentItem from '@/components/CommentItem';
 import { supabase } from '@/lib/supabase';
+import { createNotification } from '@/services/notificationService';
 
 const PostDetails = () => {
-  const { postId } = useLocalSearchParams();
+  const { postId, commentId } = useLocalSearchParams();
   const { user } = useAuth();
   const router = useRouter();
 
@@ -36,24 +37,30 @@ const PostDetails = () => {
   };
 
   useEffect(() => {
+    const numericPostId = parseInt(postId, 10); // Приведение к числу
+    if (isNaN(numericPostId)) {
+      console.error('Invalid postId:', postId);
+      return;
+    }
+
     let commentChannel = supabase
       .channel('comments')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'comments', filter: `postId=eq.${postId}` },
+        { event: 'INSERT', schema: 'public', table: 'comments', filter: `postId=eq.${numericPostId}` },
         handleNewComment,
       )
       .subscribe();
 
-    getPostDetails();
+    getPostDetails(numericPostId);
 
     return () => {
       supabase.removeChannel(commentChannel);
     };
   }, []);
 
-  const getPostDetails = async () => {
-    let res = await fetchPostsDetails(postId);
+  const getPostDetails = async (numericPostId) => {
+    let res = await fetchPostsDetails(numericPostId);
     if (res.success) {
       setPost(res.data);
     }
@@ -72,6 +79,15 @@ const PostDetails = () => {
     let res = await createComment(data);
     setLoading(false);
     if (res.success) {
+      if (user.id !== post.userId) {
+        let notify = {
+          senderId: user.id,
+          receiverId: post.userId,
+          title: 'commented on your post',
+          data: JSON.stringify({ postId: post.id, commentId: res?.data?.id }),
+        };
+        createNotification(notify);
+      }
       inputRef?.current?.clear();
       commentRef.current = '';
     } else {
@@ -159,6 +175,7 @@ const PostDetails = () => {
             <CommentItem
               key={comment?.id?.toString()}
               item={comment}
+              highlight={comment.id === commentId}
               canDelete={user.id === comment.userId || user.id === post.userId}
               onDelete={onDeleteComment(comment)}
             />
