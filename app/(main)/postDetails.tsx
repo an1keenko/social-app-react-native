@@ -36,24 +36,30 @@ const PostDetails = () => {
   };
 
   useEffect(() => {
-    let commentChannel = supabase
-      .channel('comments')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'comments', filter: `postId=eq.${postId}` },
-        handleNewComment,
-      )
-      .subscribe();
+    const numericPostId = parseInt(postId, 10); // Приведение к числу
+    if (isNaN(numericPostId)) {
+      console.error('Invalid postId:', postId);
+      return;
+    }
 
-    getPostDetails();
+    let commentChannel = supabase
+        .channel('comments')
+        .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'comments', filter: `postId=eq.${numericPostId}` },
+            handleNewComment,
+        )
+        .subscribe();
+
+    getPostDetails(numericPostId);
 
     return () => {
       supabase.removeChannel(commentChannel);
     };
   }, []);
 
-  const getPostDetails = async () => {
-    let res = await fetchPostsDetails(postId);
+  const getPostDetails = async (numericPostId) => {
+    let res = await fetchPostsDetails(numericPostId);
     if (res.success) {
       setPost(res.data);
     }
